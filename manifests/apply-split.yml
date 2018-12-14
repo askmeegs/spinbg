@@ -1,0 +1,23 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: hello-vs
+  namespace: default
+spec:
+  hosts:
+  - "*"
+  gateways:
+  - hello-gateway
+  http:
+  - match:
+    - uri:
+        prefix: /
+    route:
+    - destination:
+        host: hellosvc
+        subset: green
+      weight: 50
+    - destination:
+        host: hellosvc
+        subset: blue
+      weight: 50

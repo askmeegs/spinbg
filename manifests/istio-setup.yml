@@ -1,0 +1,49 @@
+apiVersion: networking.istio.io/v1alpha3
+kind: Gateway
+metadata:
+  name: hello-gateway
+  namespace: default
+spec:
+  selector:
+    istio: ingressgateway # use istio default controller
+  servers:
+  - port:
+      number: 80
+      name: http
+      protocol: HTTP
+    hosts:
+    - "*"
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: DestinationRule
+metadata:
+  name: hellosvc
+  namespace: default
+spec:
+  host: hellosvc
+  subsets:
+  - name: blue 
+    labels:
+      istiosubset: blue   
+  - name: green 
+    labels:
+      istiosubset: green  
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: hello-vs
+  namespace: default
+spec:
+  hosts:
+  - "*"
+  gateways:
+  - hello-gateway
+  http:
+  - match:
+    - uri:
+        prefix: /
+    route:
+    - destination:
+        host: hellosvc
+        subset: blue
